@@ -6,7 +6,7 @@ from config import BACKBONE, END_TO_END_TESTING, USE_MY_DATASET, USE_RLVS_DATASE
     PATH, HISTORY_PATH, LOG_PATH, MODEL_PATH, RESULT_PATH, DEBUG, CROSS_DATASET, PARTITION,DISCARD_SILENT_VIDEO,\
     END_TO_END_TESTING, TEST_VIDEO_PATH
     
-from utility import times, dict_to_json, generate_report_skl, Exit, video_to_wav, generate_audio_embedding,extract_feature_CV2
+from utility import times, dict_to_json, generate_report_skl, ask_for_confirmation, video_to_wav, generate_audio_embedding,extract_feature_CV2
 from model import get_model, get_best_model_from_storage
 from data_processing import get_my_data, get_rlvs_data,get_all_data, get_shuffled_data, split_train_test_data
     
@@ -14,12 +14,12 @@ from data_processing import get_my_data, get_rlvs_data,get_all_data, get_shuffle
 
 def LoadModel():
     define_model_configuration()
-    Exit("let's load the model...")
+    ask_for_confirmation("let's load the model...")
     model = get_model(dimension = 256, summary=False)
     if get_best_model_from_storage():
         model.load_weights(get_best_model_from_storage())
         return model
-    Exit(f'No model found named {PATH}. Please train a model with the configuration stated above.')
+    ask_for_confirmation(f'No model found named {PATH}. Please train a model with the configuration stated above.')
     return model
 
 def define_model_configuration():
@@ -77,19 +77,19 @@ def dataset(debug= DEBUG):
     
 def main(): 
     model = LoadModel()
-    Exit('Lets Load the dataset...')
+    ask_for_confirmation('Lets Load the dataset...')
     
     train_videos, train_audios, train_labels, test_videos, test_audios, test_labels, perm, Iperm = dataset()
     
-    Exit("Evaluate the model...")
+    ask_for_confirmation("Evaluate the model...")
     classification = evaluate_model(model, test_videos, test_audios)
     
-    Exit("let's generate verbose result...")
+    ask_for_confirmation("let's generate verbose result...")
     verbose_result(classification, test_labels, save_result=False)
     
 def test():
     model = LoadModel()
-    Exit('Lets Load the data...')
+    ask_for_confirmation('Lets Load the data...')
     
     if IF_MXNET_MODEL:
         print('END_TO_END_TESTING is not available for MXNET models.')
@@ -98,7 +98,7 @@ def test():
     files.extend(glob.glob(TEST_VIDEO_PATH+'\\*.avi'))
     files.extend(glob.glob(TEST_VIDEO_PATH+'\\*.mp4'))
     
-    Exit(f'Total videos: {len(files)}')
+    ask_for_confirmation(f'Total videos: {len(files)}')
     
     Audio_Embedding = []
     Video_Embedding = []

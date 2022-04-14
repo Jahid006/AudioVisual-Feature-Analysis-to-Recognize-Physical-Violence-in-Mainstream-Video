@@ -1,6 +1,5 @@
-BACKBONES = ['Resnet50', 'DenseNet201', 
-             'InceptionV3', 'I3D',
-             'P3D','R2+1D']
+BACKBONES = ['Resnet50', 'DenseNet201','InceptionV3',
+             'I3D','P3D','R2+1D']
 
 ######################################## Changable Configuration #######################################
 BACKBONE = BACKBONES[1]

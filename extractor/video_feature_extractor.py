@@ -1,6 +1,16 @@
+import numpy as np
+import os, tqdm
+import v_config
+import video_utils
+#from .utility import ask_for_confirmation
+#os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
 
-
-
+def ask_for_confirmation(msg=''):
+    if True:#CHECK_CONFIRMATION:
+        if(input(f'\n{msg} continue...y/n: ').lower()!='y'):
+            if (input('We are exiting....y/n: ').lower()=='y'):
+                exit()
+    else: print(f'\n{msg}')
 
 def get_backbone(backbone):
     import tensorflow as tf
@@ -17,14 +27,46 @@ def get_backbone(backbone):
     return backbone, preprocess_input
 
 
-def image_based_extractor(image_path,backbone):
-    backbone, preprocess_input = get_backbone(backbone)
+def image_based_extractor(extractor_config):
+    import tensorflow as tf, decord
+    decord.bridge.set_bridge('tensorflow')
+
+    backbone, preprocess_input = get_backbone(extractor_config.backbone_name)
     
-def mxnet_based_extractor(image_path,backbone):
+    for video_file_name in tqdm.tqdm(extractor_config.video_file_list):
+        frames = video_utils.ExtractFeatureDECORD(video_file_name,
+                                                    extractor_config.frames,
+                                                    extractor_config.width,
+                                                    extractor_config.height
+                                                    )
+        frames = tf.cast(frames, tf.float32)
+        #frames = tf.Tensor(frames, dtype=tf.float32)
+        features = np.array(backbone.predict(preprocess_input(frames)))
+        np.save(extractor_config.get_save_dir(video_file_name,
+                                              extractor_config.backbone_name,
+                                              extractor_config.frames,
+                                              extractor_config.version),                          
+                features ,
+                allow_pickle=True)
+        
+    
+    
+def mxnet_based_extractor(extractor_config):
+    from mxnet_based_feature_extractor import feature_extractor
+    
+    feature_extractor(extractor_config)
 
-
-def main():
-    pass
 
 if __name__ == "__main__":
-    main()
+    
+    IF_MXNET = True
+    
+    if IF_MXNET :
+        extractor_config = v_config.CONFIG_MXNET
+        ask_for_confirmation('You must configure the mxnet config file first.You have done it, right ?')
+        mxnet_based_extractor(extractor_config)
+        
+    else:
+        extractor_config = v_config.CONFIG
+        ask_for_confirmation('You must configure the config file first.You have done it, right ?')
+        image_based_extractor(extractor_config)

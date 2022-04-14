@@ -1,7 +1,6 @@
 import pims, numpy as np, gc
 from decord import VideoReader,  cpu
 import decord
-decord.bridge.set_bridge('tensorflow')
 
 def ExtractFeatureDECORD(FileName,frames = 16, width=224, height=224):
     try:
@@ -20,7 +19,7 @@ def ExtractFeatureDECORD(FileName,frames = 16, width=224, height=224):
 
 def ExtractFeaturePIMS(FileName,frames = 16, width=224, height=224):
     
-    V = pims.Video(FileName) 
+    V = pims.Video(FileName)
     duration = len(V) 
     try:    frame_id_list = np.sort(np.random.choice(range(duration), frames, replace=False))
     except: frame_id_list = np.sort(np.random.choice(range(duration), frames, replace=True))
@@ -29,4 +28,4 @@ def ExtractFeaturePIMS(FileName,frames = 16, width=224, height=224):
     del V 
     gc.collect()
     
-    return Frames
+    return np.array(Frames)

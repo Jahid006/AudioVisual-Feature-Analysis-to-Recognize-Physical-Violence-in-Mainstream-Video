@@ -1,7 +1,7 @@
 import numpy as np
 import glob,os
 
-from utility import ShuffleIndex, Exit
+from utility import shuffle_index, ask_for_confirmation
 from config import BACKBONE, DISCARD_SILENT_VIDEO, PARTITION
 
 
@@ -58,7 +58,7 @@ def get_rlvs_data(DEBUG=False):
     audio_available = np.array([os.path.exists(naming(video_file)) for video_file in video_files])
     
     if DISCARD_SILENT_VIDEO: 
-        Exit(f'{len(video_files) - np.sum(audio_available)} videos are discarded, because they are silent')
+        ask_for_confirmation(f'{len(video_files) - np.sum(audio_available)} videos are discarded, because they are silent')
         video_files = video_files[audio_available]
 
     videos = [np.load(video_files[k],allow_pickle=True) for k in range(len(video_files))]
@@ -103,7 +103,7 @@ def get_shuffled_data(videos, audios, labels,from_storage= None):
     
     if from_storage: 
         permutation, inversePermutation = np.load('history\permutation_index.npy',allow_pickle=True)
-    else:  permutation, inversePermutation = ShuffleIndex(len(videos))
+    else:  permutation, inversePermutation = shuffle_index(len(videos))
     
     videos = videos[permutation]
     audios = audios[permutation]
@@ -131,7 +131,7 @@ def split_train_test_data(videos, audios, labels,partition = PARTITION):
     
 def get_data_generator(videos, audios, labels, batch_size):
     while True:
-        permutation, inversePermutation = ShuffleIndex(len(videos))
+        permutation, inversePermutation = shuffle_index(len(videos))
         videos = videos[permutation]
         audios = audios[permutation]
         labels = labels[permutation]

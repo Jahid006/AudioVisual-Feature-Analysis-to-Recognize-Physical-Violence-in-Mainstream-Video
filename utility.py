@@ -28,7 +28,7 @@ def Load(name):
     print("About "+name+": \n"+about)
     return data
 
-def ShuffleIndex(l,seed=SEED):
+def shuffle_index(l,seed=SEED):
     permutation  = np.random.RandomState(seed=seed).permutation((l))
     inversePermutation = np.argsort(permutation)
     return permutation, inversePermutation
@@ -41,7 +41,7 @@ def dict_to_json(data, path):
             data.to_json(f)
         
     except Exception as e:
-        Exit(f"{e} occured. Will save the file as serialized json.")
+        ask_for_confirmation(f"{e} occured. Will save the file as serialized json.")
         with open(path, 'w') as f:
             json.dump(data, f)
                
@@ -69,7 +69,7 @@ def plot_acc(history,title=''):
     plt.legend(['train', 'test'], loc='upper left')
     plt.savefig(f'{RESULT_PATH}\\accuracy_{title}.png')
     
-def Exit(msg=''):
+def ask_for_confirmation(msg=''):
     if CHECK_CONFIRMATION:
         if(input(f'\n{msg} continue...y/n: ').lower()!='y'):
             if (input('We are exiting....y/n: ').lower()=='y'):
@@ -88,7 +88,6 @@ def generate_report(a,b,v=0): #actual,predicted
     tn = sum((a==1) & (b==1))
     fn = sum((a==0) & (b==1))
     fp = sum((a==1) & (b==0))
-    #print("TP: ",tp," TN: ",tn,' FN: ',fn,' FP: ',fp)
     
     confusion_matrix = {'TP': int(tp), 'TN': int(tn), 'FN': int(fn), 'FP': int(fp)}
     
@@ -198,7 +197,7 @@ def extract_feature_CV2(FileName,backbone= None,frames = 16, width=224, height=2
     """get frames from video using cv2"""
     import cv2
     
-    if backbone == None:Exit('No backbone provided....')
+    if backbone == None:ask_for_confirmation('No backbone provided....')
     backbone, preprocess_input = get_backbone(backbone)
     
     V = cv2.VideoCapture(FileName)

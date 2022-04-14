@@ -6,7 +6,7 @@ import glob
 import numpy as np
 
 from config import INPUT_DIM, MODEL_PATH, LOG_PATH, IF_MXNET_MODEL, INPUT_DIM, LEARNING_RATE, EPOCHS
-from utility import Exit
+from utility import ask_for_confirmation
 
 
 def exponential_decay(epoch,lr):
