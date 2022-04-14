@@ -1,6 +1,6 @@
 import numpy as np
 import os, tqdm
-import v_config
+import cfg
 import video_utils
 #from .utility import ask_for_confirmation
 #os.environ['CUDA_VISIBLE_DEVICES'] = '-1'
@@ -26,7 +26,6 @@ def get_backbone(backbone):
         
     return backbone, preprocess_input
 
-
 def image_based_extractor(extractor_config):
     import tensorflow as tf, decord
     decord.bridge.set_bridge('tensorflow')
@@ -48,25 +47,22 @@ def image_based_extractor(extractor_config):
                                               extractor_config.version),                          
                 features ,
                 allow_pickle=True)
-        
-    
     
 def mxnet_based_extractor(extractor_config):
     from mxnet_based_feature_extractor import feature_extractor
     
     feature_extractor(extractor_config)
 
-
 if __name__ == "__main__":
     
     IF_MXNET = True
     
     if IF_MXNET :
-        extractor_config = v_config.CONFIG_MXNET
+        extractor_config = cfg.CONFIG_MXNET
         ask_for_confirmation('You must configure the mxnet config file first.You have done it, right ?')
         mxnet_based_extractor(extractor_config)
         
     else:
-        extractor_config = v_config.CONFIG
+        extractor_config = cfg.CONFIG
         ask_for_confirmation('You must configure the config file first.You have done it, right ?')
         image_based_extractor(extractor_config)

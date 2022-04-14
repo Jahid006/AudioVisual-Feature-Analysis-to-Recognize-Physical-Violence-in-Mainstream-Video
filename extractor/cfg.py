@@ -1,12 +1,12 @@
 import glob, os, logging
 
-
-def get_files(video_files_path):
-    files = glob.glob(video_files_path+'/**/*.mp4',recursive=True)
-    files.extend(glob.glob(video_files_path+'/**/*.avi',recursive=True))
+def get_files(video_files_path, extensions = ['.mp4','.avi','.mov']):
+    
+    files = []
+    for extension in extensions:
+        files.extend(glob.glob(video_files_path+'/**/*'+extension,recursive=True))
     return files
     
-
 def make_text_file(video_files_path, text_file_path = 'video.txt'):
     
     files = get_files(video_files_path) 
@@ -18,10 +18,10 @@ def make_text_file(video_files_path, text_file_path = 'video.txt'):
             f.write(file+ '  1  1 '+'\n')
     return text_file_path
 
-def get_save_dir(z, model_name,num_segment, version):
+def get_save_dir(z, model_name,num_segment, version, to_replace = '/video'):
     feat_file = z.replace(z[-4:], '.npy')
     feat_file = feat_file.replace('/dataset/', '/features/')
-    feat_file = feat_file.replace('/video', f"/video/{model_name.lower().split('_')[0]+'.'+str(num_segment)}s{version}")    
+    feat_file = feat_file.replace(to_replace, f"{to_replace}/{model_name.lower().split('_')[0]+'.'+str(num_segment)}s{version}")    
     return feat_file
 
 def set_logger():
@@ -79,5 +79,14 @@ class CONFIG:
     get_save_dir = get_save_dir
     version = ''
     
-
+class AUDIO_CONFIG:
+    model_name ='yamnet'
+    frames = 16000
+    is_mono = True
+    num_segments = 1
+    video_files_path= "F:\S-Home\ViolenceRecognizer\data\\test_data"
+    video_file_list = get_files(video_files_path)
+    get_save_dir = get_save_dir
+    version = ''
+    to_replace = '/audio'
     

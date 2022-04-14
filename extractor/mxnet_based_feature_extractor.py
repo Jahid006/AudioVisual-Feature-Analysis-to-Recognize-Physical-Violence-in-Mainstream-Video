@@ -12,7 +12,6 @@ from gluoncv.model_zoo import get_model
 from gluoncv.data import VideoClsCustom
 from gluoncv.utils.filesystem import try_import_decord
 
-
 def read_data(opt, video_name, transform, video_utils):
 
     decord = try_import_decord()
