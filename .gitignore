@@ -6,3 +6,5 @@
 ./**/*.jpg
 ./**/*.ipynb
 data
+**__pycache__**
+
