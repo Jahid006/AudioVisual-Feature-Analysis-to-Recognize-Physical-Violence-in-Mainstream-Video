@@ -7,4 +7,5 @@
 ./**/*.ipynb
 data
 **__pycache__**
-./ipynb 
+ipynb 
+__pycache__
