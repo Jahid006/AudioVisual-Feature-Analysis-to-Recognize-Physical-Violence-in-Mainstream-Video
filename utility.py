@@ -1,6 +1,9 @@
 import numpy as np
 import  os, joblib, json
 
+import pims, gc
+from decord import VideoReader,  cpu
+
 from datetime import datetime
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -8,12 +11,22 @@ import moviepy.editor as mpy
 
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import classification_report
+import config as cfg
 
-from config import RESULT_PATH, CHECK_CONFIRMATION, SEED
     
 def times():
     now = datetime.now()
     return str(now.strftime("%d-%m-%Y..%H.%M.%S"))
+
+def make_dir(path):
+    if not os.path.exists(path):
+        os.makedirs(path) 
+    else:
+        ask_for_confirmation('Directories already exists. Proceeding to train a model with\
+            this configuration might conflict with existing trained model.')  
+        
+def make_dirs():
+    _ = [make_dir(i) for i in [cfg.HISTORY_PATH, cfg.LOG_PATH, cfg.MODEL_PATH, cfg.RESULT_PATH]]
 
 def save(name,data,about="Undocumented"):
     
@@ -28,7 +41,7 @@ def Load(name):
     print("About "+name+": \n"+about)
     return data
 
-def shuffle_index(l,seed=SEED):
+def shuffle_index(l,seed=cfg.SEED):
     permutation  = np.random.RandomState(seed=seed).permutation((l))
     inversePermutation = np.argsort(permutation)
     return permutation, inversePermutation
@@ -57,7 +70,7 @@ def plot_loss(history, title=''):
     plt.ylabel('loss')
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
-    plt.savefig(f'{RESULT_PATH}\loss_{title}.png')
+    plt.savefig(f'{cfg.RESULT_PATH}\loss_{title}.png')
 
 def plot_acc(history,title=''):
     plt.figure(figsize=(10,10))
@@ -67,10 +80,10 @@ def plot_acc(history,title=''):
     plt.ylabel('accuracy')
     plt.xlabel('epoch')
     plt.legend(['train', 'test'], loc='upper left')
-    plt.savefig(f'{RESULT_PATH}\\accuracy_{title}.png')
+    plt.savefig(f'{cfg.RESULT_PATH}\\accuracy_{title}.png')
     
 def ask_for_confirmation(msg=''):
-    if CHECK_CONFIRMATION:
+    if cfg.CHECK_CONFIRMATION:
         if(input(f'\n{msg} continue...y/n: ').lower()!='y'):
             if (input('We are exiting....y/n: ').lower()=='y'):
                 exit()
@@ -111,7 +124,7 @@ def generate_report(a,b,v=0): #actual,predicted
     return report   
 
 def generate_report_skl(y_true, y_pred):
-    
+    print(confusion_matrix(y_true, y_pred))
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred).ravel()
     confusion_matrix_ = {'TP': int(tp), 'TN': int(tn), 'FN': int(fn), 'FP': int(fp)}
     
@@ -209,3 +222,32 @@ def extract_feature_CV2(FileName,backbone= None,frames = 16, width=224, height=2
     Frames = np.array([cv2.resize(frame,(width,height)) for frame in Frames])
     features = np.array(backbone.predict(preprocess_input(Frames)))
     return features
+
+
+def extract_features_DECORD(FileName,backbone, preprocessor_fn, frames = 16, width=224, height=224):
+    try:
+        V = VideoReader(FileName,  ctx=cpu(0), width= width, height=height)
+        duration = len(V)
+        try:    frame_id_list = np.sort(np.random.choice(range(duration), frames, replace=False))
+        except: frame_id_list = np.sort(np.random.choice(range(duration), frames, replace=True))
+        
+        Frames = V.get_batch(frame_id_list)
+        del V
+        gc.collect()
+    except Exception as e:
+        print(f"Decord decoding error{e}, using PIMS")
+        return ExtractFeaturesPIMS(FileName, frames, width, height)
+    return backbone.predict(preprocessor_fn(np.array(Frames)))
+
+def ExtractFeaturesPIMS(FileName,backbone, preprocessor_fn,frames = 16, width=224, height=224):
+    
+    V = pims.Video(FileName)
+    duration = len(V) 
+    try:    frame_id_list = np.sort(np.random.choice(range(duration), frames, replace=False))
+    except: frame_id_list = np.sort(np.random.choice(range(duration), frames, replace=True))
+    Frames = V[frame_id_list]
+    #Frames = torch.tensor(Frames)
+    del V 
+    gc.collect()
+    
+    return backbone.predict(preprocessor_fn(np.array(Frames)))

@@ -40,11 +40,11 @@ def get_callbacks():
 
 def get_model(dimension = 512,summary = False,input_shape = INPUT_DIM):
     
-    FeatureInput = Input(shape=input_shape)
+    FeatureInput = Input(shape=input_shape,name='video')
     Average_feature = layers.Flatten()(FeatureInput) if  IF_MXNET_MODEL \
                         else tf.reduce_max(FeatureInput,-2)*.25 + tf.reduce_mean(FeatureInput,-2)*.75
     
-    AudioInput =   Input(shape=(1024))
+    AudioInput =   Input(shape=(1024), name='audio')
     audio_ = layers.Dense(dimension//4,kernel_initializer='normal', activation='linear')(AudioInput)
     audio_ = layers.BatchNormalization()(audio_)
     audio_ = layers.Activation(tf.nn.relu)(audio_)
@@ -61,6 +61,7 @@ def get_model(dimension = 512,summary = False,input_shape = INPUT_DIM):
     output = layers.Dense(1,kernel_initializer='normal', activation='sigmoid',name = 'classifier')(combined)
     
     model = Model(inputs= [FeatureInput,AudioInput], outputs = output)
+    
     model.compile(optimizer=tf.optimizers.Nadam(learning_rate=LEARNING_RATE), loss='binary_crossentropy',metrics=['accuracy'])
     
     if summary:print(model.summary())

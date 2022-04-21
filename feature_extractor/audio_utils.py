@@ -9,14 +9,17 @@ import tqdm,numpy as np,os,tqdm,glob
 def video_to_wav(video):
     """convert video to wav using moviepy and save it in audio directory"""
     path = video[:-4] + ".wav"
-    path = path.replace('video','audio')
+    #path = path.replace('video','audio')
     if os.path.exists(path):
         return path
-    clip = mpy.VideoFileClip(video)
-    audio = clip.audio
-    
-    #os.makedirs(path, exist_ok=True)
-    audio.write_audiofile(path)
+    try:
+        clip = mpy.VideoFileClip(video)
+        audio = clip.audio
+        
+        #os.makedirs(path, exist_ok=True)
+        audio.write_audiofile(path)
+    except:
+        return "[NO_AUDIO]"
     return path
     
 @tf.function
@@ -32,15 +35,18 @@ def load_wav_16k_mono(filename):
     
     return wav
 
-def wav_to_audio_embedding(audio_path,yamnet_model,cfg):
+def wav_to_audio_embedding(audio_path,yamnet_model,cfg,save= True, return_feat= False):
     """ save the embedding of the audio file """
-    gg, embeddings, kk = yamnet_model(load_wav_16k_mono(audio_path))  
-    name = cfg.get_save_dir(audio_path, cfg.model_name,cfg.num_segments, cfg.version, cfg.to_replace)
+      
+    if save: name = cfg.get_save_dir(audio_path, cfg.model_name,cfg.num_segments, cfg.version, cfg.to_replace)
+    if os.path.exists(name):return
     
+    gg, embeddings, kk = yamnet_model(load_wav_16k_mono(audio_path))
     embeddings = np.max(embeddings,axis=0)*.25+np.mean(embeddings,axis=0)*.75 
     embeddings = embeddings.reshape(-1)
     
-    np.save(name,embeddings , allow_pickle=True)
+    if save : np.save(name,embeddings , allow_pickle=True)
+    
     
 
 def main(audio_data):

@@ -1,6 +1,5 @@
 import pims, numpy as np, gc
 from decord import VideoReader,  cpu
-import decord
 
 def ExtractFeatureDECORD(FileName,frames = 16, width=224, height=224):
     try:

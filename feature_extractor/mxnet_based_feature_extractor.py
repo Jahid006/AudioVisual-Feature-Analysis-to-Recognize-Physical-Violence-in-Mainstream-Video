@@ -130,7 +130,7 @@ def feature_extractor(opt):
         video_feat = net(video_input.astype(opt.dtype, copy=False))
 
         #feat_file = '%s_%s_feat.npy' % (model_name, video_name)
-        feat_file = opt.get_save_dir(z, model_name,opt.num_segments, opt.version)
+        feat_file = opt.get_save_dir(z, model_name,opt.num_segments, opt.version, to_replace= 'video')
         print(feat_file)#;exit()
         os.makedirs(os.path.dirname(feat_file), exist_ok=True)
         #np.save(os.path.join(opt.save_dir, feat_file), video_feat.asnumpy())
