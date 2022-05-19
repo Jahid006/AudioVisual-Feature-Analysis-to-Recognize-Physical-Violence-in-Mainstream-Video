@@ -18,25 +18,25 @@ SEGMENTS ={  'Resnet50':16,
 
 
 ######################################## Changable Configuration #######################################
-BACKBONE = BACKBONES[0]
-USE_MY_DATASET = True
-USE_RLVS_DATASET = True
+BACKBONE = BACKBONES[0]  #which backbone to use
+USE_MY_DATASET = True #True if you want to use my dataset, False otherwise
+USE_RLVS_DATASET = True #True if you want to use rlvs dataset, False otherwise
 
 CROSS_DATASET_VALIDATION = '' #could be 'rlvs' or 'my_dataset'
 ONLY = '_only' if ((USE_MY_DATASET ^ USE_RLVS_DATASET) and CROSS_DATASET_VALIDATION == '') else ''
-TEST_PARTITION = .1
-VAL_PARTITION = .1
+TEST_PARTITION = .1 #partition of the test set
+VAL_PARTITION = .1 #partition of the validation set
 
-CHECK_CONFIRMATION = True
-DISCARD_SILENT_VIDEO = False
+CHECK_CONFIRMATION = True 
+DISCARD_SILENT_VIDEO = False #if True, discard silent videos
 SEED = 0
 DEBUG = True
 EPOCHS = 50
 LEARNING_RATE = .003
-BATCH_SIZE =32
-MODEL_DIMENSION = 256
-VERSION = 'v0'
-NUM_SEGMENTS = SEGMENTS[BACKBONE]
+BATCH_SIZE =32 
+MODEL_DIMENSION = 256 #dimension of the model
+VERSION = 'v0' #version of the model
+NUM_SEGMENTS = SEGMENTS[BACKBONE] #number of segments to split the video into
 
 
 
@@ -51,8 +51,6 @@ MY_AUDIO_FEATURES_PATH = r"F:\S-Home\ViolenceRecognizer\data\dataset\my_dataset"
 END_TO_END_TESTING = False
 TEST_VIDEO_PATH = './data/test_data' #mp4 only
 TRAINED_MODEL_PATH = ''
-
-
 
 
 ######################################---Auto-Config---###############################################
