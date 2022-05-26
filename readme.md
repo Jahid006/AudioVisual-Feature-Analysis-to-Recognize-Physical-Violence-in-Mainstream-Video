@@ -1,6 +1,6 @@
 Analyze Audio-Visual Features to Recognize Physical Violence in the Mainstream Videos
 
-The project utilises both audio and video features to recognize violent content in the mainstream videos. For reduce the training time, we decided to extract video and audio features beforehand and then use these features to train our violence recognizer model.
+The project utilises both audio and video features to recognize violent content in the mainstream videos. To reduce the training time, we decided to extract video and audio features beforehand and then use these features to train our violence recognizer model.
 
 For feature extraction, please follow readme.md file in feature_extractor folder.
 
