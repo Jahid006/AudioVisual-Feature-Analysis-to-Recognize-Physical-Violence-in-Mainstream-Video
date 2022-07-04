@@ -3,7 +3,6 @@ import moviepy.editor as mpy
 
 import tensorflow_hub as hub,tensorflow as tf
 import tensorflow_io as tfio
-import tqdm,numpy as np,os,tqdm,glob
 
 
 def video_to_wav(video):
